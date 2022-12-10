@@ -21,7 +21,7 @@ export class Profiler implements ScreepsProfiler {
     }
 
     public static isEnabled(): boolean {
-        return Memory.profiler.start !== undefined;
+        return Memory.profiler?.start !== undefined;
     }
 
     public start() {
@@ -68,7 +68,12 @@ export class Profiler implements ScreepsProfiler {
         let time: number;
         let result: Partial<OutputData>;
 
-        const data = Object.getOwnPropertyNames(Memory.profiler.data).map(key => {
+        const propertyKeys: PropertyKey[] = [
+            ...Object.getOwnPropertyNames(Memory.profiler.data),
+            ...Object.getOwnPropertySymbols(Memory.profiler.data)
+        ];
+
+        const data = propertyKeys.map(key => {
             calls = Memory.profiler.data[key].calls;
             time = Memory.profiler.data[key].time;
             result = {};

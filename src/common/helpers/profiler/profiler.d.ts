@@ -26,5 +26,3 @@ interface ScreepsProfiler {
 
     toString(): string;
 }
-
-declare const __PROFILER_ENABLED__: boolean;

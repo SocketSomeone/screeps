@@ -1,22 +1,27 @@
-import { ErrorMapper, Profiler, logger } from "helpers";
+import { ErrorMapper, Profiler } from "common/helpers";
+import { Client } from "./client";
+
+declare global {
+    interface Memory {
+        uuid: number;
+        log: any;
+        towersIds: Id<StructureTower>[];
+    }
+
+    interface FlagMemory {
+        [name: string]: any;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace NodeJS {
+        interface Global {
+            log: any;
+            Profiler: ScreepsProfiler;
+        }
+    }
+}
 
 global.Profiler = Profiler.init();
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
-export const loop = ErrorMapper.wrapLoop(() => {
-    logger.info(`Current game tick is ${Game.time}`);
-
-    if (!Memory.uuid || Memory.uuid >= Number.MAX_SAFE_INTEGER) {
-        Memory.uuid = 0;
-    }
-
-    if (Game.time % 100 === 0) {
-        for (const name in Memory.creeps) {
-            if (!(name in Game.creeps)) {
-                logger.info(`Clearing non-existing creep memory: ${name}`);
-                delete Memory.creeps[name];
-            }
-        }
-    }
-});
+export const loop = ErrorMapper.wrapLoop(() => new Client().loop());
